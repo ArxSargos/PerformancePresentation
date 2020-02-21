@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Arrow function vs. Anonymous function</title>
+</head>
+
+<body>
+    <script>
+// --- Benchmarked functions ------------------------------------------------------------
+        function runArrow() {
+            let count1 = 0;
+            let start1 = new Date();
+            for (let i = 0; i < 1000000; i++) {
+                count1 = (count1 => {               // \
+                    return count1 + 1;              //  > Difference
+                })(count1);                         // /
+            }
+            let end1= new Date();
+            customLog("Counted Sum: ", count1, " time: ", end1 - start1);
+            return end1 - start1;
+        }
+
+        function runAnonymous() {
+            let count2 = 0;
+            let start2 = new Date();
+            for (let i = 0; i < 1000000; i++) {
+                (function() {                       // \
+                    count2 = count2 + 1;            //  > Difference
+                })();                               // /
+            }
+            let end2 = new Date();
+            customLog("Counted Sum: ", count2, " time: ", end2 - start2);
+            return end2 - start2;
+        }
+// --------------------------------------------------------------------------------------
+
+        function getAverageLoop(repeatCount) {
+            let timeSumArrow = 0;
+            let timeSumAnon = 0;
+
+            for(let i =0; i < repeatCount; i++) {
+                // Rows
+                output = document.getElementById("outputArrow");
+                timeSumArrow = timeSumArrow + runArrow();
+
+                // Cols
+                output = document.getElementById("outputAnon");
+                timeSumAnon = timeSumAnon + runAnonymous();
+            }
+            output = document.getElementById("outputArrow");
+            customLog(`Average time of access by Arrow functions is ${timeSumArrow/repeatCount}ms`);
+            output = document.getElementById("outputAnon");
+            customLog(`Average time of access by Anonymous functions is ${timeSumAnon/repeatCount}ms`);
+        }
+
+        function customLog() {
+            console.log(...arguments);
+            for (const arg of arguments) {
+                let sp = document.createElement("span");
+                sp.innerText = arg.toString();
+                output.appendChild(sp);
+            }
+            let br = document.createElement("br");
+            output.appendChild(br);
+            let hr = document.createElement("hr");
+            output.appendChild(hr);
+        }
+    </script>
+    <div>
+            <h1>Arrow vs. Anonymous function</h1>
+            <p>Example: Loop of 1 000 000 functions</p>
+    
+            <h2>Arrow function</h2>
+            <pre>(count1 => { return count1 + 1; })(count1);</pre>
+    
+            <h2>Anonymous function</h2>
+            <pre>(function() { count2 = count2 + 1; })();</pre>
+    
+            <p>Number of repetitions: <input type="number" value="8" id="loopCount"></p>
+    
+            <table id="results">
+                <tr>
+                    <td>
+                        <div id="outputArrow"></div>
+                    </td>
+                    <td>
+                        <div id="outputAnon"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button onclick="getAverageLoop(document.getElementById('loopCount').value)">Benchmark functions</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+</body>
+</html>
